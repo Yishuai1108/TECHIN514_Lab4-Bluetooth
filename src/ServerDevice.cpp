@@ -1,3 +1,140 @@
+// Scanner
+
+// #include <Arduino.h>  // Ensure this is included
+// #include <BLEDevice.h>
+// #include <BLEUtils.h>
+// #include <BLEScan.h>
+// #include <BLEAdvertisedDevice.h>
+
+// int scanTime = 5; // Scan duration in seconds
+// BLEScan* pBLEScan;
+
+// class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+//     void onResult(BLEAdvertisedDevice advertisedDevice) {
+//         Serial.printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
+//     }
+// };
+
+// void setup() {
+//     Serial.begin(115200);
+//     Serial.println("Scanning...");
+
+//     BLEDevice::init("");
+//     pBLEScan = BLEDevice::getScan(); // Create new scan instance
+//     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+//     pBLEScan->setActiveScan(true); // Active scan uses more power but gets results faster
+//     pBLEScan->setInterval(100);
+//     pBLEScan->setWindow(99);  // Must be ≤ interval value
+// }
+
+// void loop() {
+//     BLEScanResults foundDevices = pBLEScan->start(scanTime, false);
+//     Serial.print("Devices found: ");
+//     Serial.println(foundDevices.getCount());
+//     Serial.println("Scan done!");
+    
+//     pBLEScan->clearResults(); // Delete scan results to free memory
+//     delay(10000); // Wait before next scan
+// }
+
+
+// Connection Code
+
+// #include <Arduino.h>
+// #include <BLEDevice.h>
+// #include <BLEServer.h>
+// #include <BLEUtils.h>
+// #include <BLE2902.h>
+
+// // UUIDs - Change these to unique values
+// #define SERVICE_UUID        "ab80fa7f-9e7a-47d2-8163-045cceb6c927"
+// #define CHARACTERISTIC_UUID "000000ee-0000-1000-8000-00805f9b34fb"
+
+// BLEServer* pServer = NULL;
+// BLECharacteristic* pCharacteristic = NULL;
+// bool deviceConnected = false;
+// bool oldDeviceConnected = false;
+// unsigned long previousMillis = 0;
+// const long interval = 1000;  // 1-second interval
+
+// // Server Callbacks
+// class MyServerCallbacks : public BLEServerCallbacks {
+//     void onConnect(BLEServer* pServer) {
+//         deviceConnected = true;
+//     };
+
+//     void onDisconnect(BLEServer* pServer) {
+//         deviceConnected = false;
+//     }
+// };
+
+// void setup() {
+//     Serial.begin(115200);
+//     Serial.println("Starting BLE server...");
+
+//     // Initialize BLE
+//     BLEDevice::init("Chang&Yishuai");  // Set device name
+//     pServer = BLEDevice::createServer();
+//     pServer->setCallbacks(new MyServerCallbacks());
+
+//     // Create service & characteristic
+//     BLEService *pService = pServer->createService(SERVICE_UUID);
+//     pCharacteristic = pService->createCharacteristic(
+//         CHARACTERISTIC_UUID,
+//         BLECharacteristic::PROPERTY_READ |
+//         BLECharacteristic::PROPERTY_NOTIFY
+//     );
+
+//     pCharacteristic->addDescriptor(new BLE2902());
+//     pCharacteristic->setValue("Hello World");  // Initial value
+//     pService->start();
+
+//     // Start advertising
+//     BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+//     pAdvertising->addServiceUUID(SERVICE_UUID);
+//     pAdvertising->setScanResponse(true);
+//     pAdvertising->setMinPreferred(0x06);  // Improve iPhone connection
+//     pAdvertising->setMinPreferred(0x12);
+
+//     // Set name in advertisement
+//     BLEAdvertisementData advertisementData;
+//     advertisementData.setName("Chang&Yishuai");
+//     pAdvertising->setAdvertisementData(advertisementData);
+
+//     BLEDevice::startAdvertising();
+//     Serial.println("BLE server is ready!");
+// }
+
+// void loop() {
+//     if (deviceConnected) {
+//         unsigned long currentMillis = millis();
+//         if (currentMillis - previousMillis >= interval) {
+//             previousMillis = currentMillis;
+//             pCharacteristic->setValue("Hello World");
+//             pCharacteristic->notify();
+//             Serial.println("Sent: Hello World");
+//         }
+//     }
+
+//     // Handle reconnection
+//     if (!deviceConnected && oldDeviceConnected) {
+//         delay(500);  // Give the BLE stack some time
+//         pServer->startAdvertising();
+//         Serial.println("Restarting advertising...");
+//         oldDeviceConnected = deviceConnected;
+//     }
+
+//     if (deviceConnected && !oldDeviceConnected) {
+//         oldDeviceConnected = deviceConnected;
+//     }
+
+//     delay(1000);
+// }
+
+
+
+
+
 // Server Device Code for Raw and Filtered Data
 
 #include <Arduino.h>
